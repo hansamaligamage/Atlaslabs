@@ -1,0 +1,238 @@
+﻿@{
+    ViewData["Title"] = "Travel Buddy Chat";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-chat-dots"></i> Travel Buddy Assistant
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Chat Messages Container -->
+                    <div id="chatMessages" class="chat-messages mb-3">
+                        <div class="text-center text-muted py-5">
+                            <i class="bi bi-chat-text" style="font-size: 3rem;"></i>
+                            <p class="mt-3">Start a conversation by asking a question below!</p>
+                        </div>
+                    </div>
+
+                    <!-- Chat Input -->
+                    <div class="chat-input">
+                        <div class="input-group">
+                            <input type="text"
+                                   id="messageInput"
+                                   class="form-control"
+                                   placeholder="Ask me anything about travel..."
+                                   autocomplete="off">
+                            <button class="btn btn-primary" id="sendButton" type="button">
+                                <i class="bi bi-send"></i> Send
+                            </button>
+                        </div>
+                        <div id="loadingIndicator" class="text-muted mt-2" style="display: none;">
+                            <small>
+                                <span class="spinner-border spinner-border-sm me-1"></span>
+                                Thinking...
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .chat-messages {
+        height: 500px;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        padding: 1rem;
+        background-color: #f8f9fa;
+    }
+
+    .message {
+        margin-bottom: 1rem;
+        animation: fadeIn 0.3s ease-in;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .message-content {
+        padding: 0.75rem 1rem;
+        border-radius: 1rem;
+        max-width: 80%;
+    }
+
+    .user-message .message-content {
+        background-color: #0d6efd;
+        color: white;
+        margin-left: auto;
+        text-align: right;
+    }
+
+    .assistant-message .message-content {
+        background-color: white;
+        border: 1px solid #dee2e6;
+        margin-right: auto;
+    }
+
+    .message-content strong {
+        display: block;
+        margin-bottom: 0.25rem;
+        font-size: 0.875rem;
+    }
+
+    .message-content p {
+        margin: 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    .user-message .message-content strong {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .chat-input {
+        position: relative;
+    }
+
+    #messageInput {
+        border-radius: 1.5rem;
+        padding: 0.75rem 1rem;
+    }
+
+    #sendButton {
+        border-radius: 1.5rem;
+        padding: 0.75rem 1.5rem;
+    }
+
+    .card {
+        border: none;
+    }
+
+    .card-header {
+        border-radius: 0.375rem 0.375rem 0 0 !important;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            const chatMessages = $('#chatMessages');
+            const messageInput = $('#messageInput');
+            const sendButton = $('#sendButton');
+            const loadingIndicator = $('#loadingIndicator');
+
+            // Auto-scroll to bottom
+            function scrollToBottom() {
+                chatMessages.scrollTop(chatMessages[0].scrollHeight);
+            }
+
+            // Add message to chat
+            function addMessage(message, isUser) {
+                // Remove welcome message on first interaction
+                if (chatMessages.find('.text-center.text-muted').length > 0) {
+                    chatMessages.empty();
+                }
+
+                const messageClass = isUser ? 'user-message' : 'assistant-message';
+                const sender = isUser ? 'You' : 'Assistant';
+
+                const messageHtml = `
+                    <div class="message ${messageClass}">
+                        <div class="message-content">
+                            <strong>${sender}:</strong>
+                            <p>${escapeHtml(message)}</p>
+                        </div>
+                    </div>
+                `;
+
+                chatMessages.append(messageHtml);
+                scrollToBottom();
+            }
+
+            // Escape HTML to prevent XSS
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            // Send message
+            async function sendMessage() {
+                const message = messageInput.val().trim();
+
+                if (!message) {
+                    return;
+                }
+
+                // Disable input while processing
+                messageInput.prop('disabled', true);
+                sendButton.prop('disabled', true);
+                loadingIndicator.show();
+
+                // Add user message to chat
+                addMessage(message, true);
+                messageInput.val('');
+
+                try {
+                    const response = await fetch('/Home/Chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(message)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+
+                    const data = await response.json();
+
+                    // Add assistant response to chat
+                    addMessage(data.response || 'No response received', false);
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    addMessage('Sorry, there was an error processing your message.', false);
+                } finally {
+                    // Re-enable input
+                    messageInput.prop('disabled', false);
+                    sendButton.prop('disabled', false);
+                    loadingIndicator.hide();
+                    messageInput.focus();
+                }
+            }
+
+            // Send on button click
+            sendButton.on('click', sendMessage);
+
+            // Send on Enter key
+            messageInput.on('keypress', function (e) {
+                if (e.which === 13 && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            // Focus input on load
+            messageInput.focus();
+        });
+    </script>
+}
