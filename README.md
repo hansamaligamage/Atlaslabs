@@ -85,17 +85,6 @@ Atlaslabs/
 
 ---
 
-## Deployment
-
-See [DEPLOYMENT.md](DEPLOYMENT.md) for full instructions on deploying to **Azure App Service** using GitHub Actions, including:
-
-- Deploying with a publish profile
-- Deploying with a Service Principal
-- Configuring managed identity
-- Monitoring and troubleshooting
-
----
-
 ## Tech Stack
 
 | Component | Technology |
