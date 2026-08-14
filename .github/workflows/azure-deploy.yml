@@ -9,7 +9,7 @@ on:
 env:
   DOTNET_VERSION: 10.0.x
   PROJECT_PATH: Atlaslabs/Atlaslabs.csproj
-  PUBLISH_PATH: ${{ github.workspace }}/publish
+  PUBLISH_PATH: publish
 
 jobs:
   build:
