@@ -77,19 +77,22 @@ az webapp deployment list-publishing-profiles \
   --xml > publish-profile.xml
 ```
 
-### Step 4: Add GitHub Secret
+### Step 4: Add GitHub Secret and Variable
 
 1. Go to your GitHub repository
 2. Navigate to **Settings** ? **Secrets and variables** ? **Actions**
-3. Click **New repository secret**
+3. Under **Secrets**, click **New repository secret**
 4. Name: `AZURE_WEBAPP_PUBLISH_PROFILE`
 5. Value: Paste the contents of `publish-profile.xml`
-6. Click **Add secret**
+6. Under **Variables**, click **New repository variable**
+7. Name: `AZURE_WEBAPP_NAME`
+8. Value: Your Azure Web App name (for example, `atlaslabs-app`)
 
-### Step 5: Update Workflow File
+### Step 5: Use the Workflow File
 
-Edit `.github/workflows/azure-deploy.yml` and update:
-- `AZURE_WEBAPP_NAME` to your app name
+The workflow file `.github/workflows/azure-deploy.yml` reads:
+- `AZURE_WEBAPP_NAME` from a GitHub Actions repository variable
+- `AZURE_WEBAPP_PUBLISH_PROFILE` from a GitHub Actions secret
 
 ### Step 6: Push to GitHub
 
