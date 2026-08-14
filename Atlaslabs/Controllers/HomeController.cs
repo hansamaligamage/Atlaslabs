@@ -32,6 +32,7 @@ namespace Atlaslabs.Controllers
             catch (Exception ex)
             {
                 // Log the error for debugging
+                //
                 Console.WriteLine($"Chat error: {ex.Message}");
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
 
