@@ -93,7 +93,7 @@ Atlaslabs/
 | AI Integration | Azure AI Projects SDK (`Azure.AI.Projects`) |
 | Authentication | Azure Identity (`DefaultAzureCredential`) |
 | Hosting | Azure App Service |
-| CI/CD | GitHub Actions |
+| CI/CD | GitHub Actions  |
 
 ---
 
