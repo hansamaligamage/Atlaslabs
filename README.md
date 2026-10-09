@@ -9,7 +9,7 @@ Atlaslabs is an ASP.NET Core web application that provides a chat interface powe
 - 🤖 Real-time chat with an Azure AI Foundry agent
 - 🔐 Secure authentication via Azure Managed Identity (`DefaultAzureCredential`)
 - 🌐 ASP.NET Core MVC web application targeting .NET 10
-- ☁️ Deployable to Azure App Service via GitHub Actions. 
+- ☁️ Deployable to Azure App Service via GitHub Actions.
 
 ---
 
